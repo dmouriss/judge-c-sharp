@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# parsing configuration
+config="$(mktemp)"
+cat > "$config"
+
+resources="$(jshon -e 'resources' -u < "$config")"
+judge="$(jshon -e 'judge' -u < "$config")"
+workdir="$(jshon -e 'workdir' -u < "$config")"
+
+# Prepare to compile
+compiledir=$(mktemp -d)
+cd $compiledir
+cp -r $resources/* .
+cat "$(jshon -e 'source' -u < "$config")" > "solution.cs"
+
+# See if user code can be compiled
+compileresult="$(mktemp)"
+
+csc -target:library "solution.cs" > $compileresult
+if [ $? -ne 0 ]; then
+    jshon -s "start-judgement"  -i "command" <<< "{}"
+    message="<pre>$(cat $compileresult | tail -n +4)</pre>"
+    jshon -s "append-message" -i "command" -n {} -s "html" -i "format" -s "$message" -i "description" -i "message"<<< "{}"
+    jshon -s "close-judgement"  -i "command" -n {} -s "compilation error" -i "enum" -i "status" <<< "{}"
+    exit 0
+fi
+
+# Take default projectfile when there is none
+if [ $(find . -name testproject.csproj | wc -l ) -eq 0 ]; then
+    cp $judge/defaults/testproject.csproj testproject.csproj
+fi
+
+# Add necesary libraries (mainly nunit)
+nuget restore -verbosity quiet testproject.csproj
+
+# Compile the code together with the tests
+msbuild /verbosity:quiet testproject.csproj > $compileresult
+if [ $? -ne 0 ]; then
+    jshon -s "start-judgement"  -i "command" <<< "{}"
+    message="<pre>$(cat $compileresult | tail -n +4)</pre>"
+    jshon -s "append-message" -i "command" -n {} -s "html" -i "format" -s "$message" -i "description" -i "message"<<< "{}"
+    jshon -s "close-judgement"  -i "command" -n {} -s "compilation error" -i "enum" -i "status" <<< "{}"
+    exit 0
+fi
+
+# Execute the tests
+mv net40/* $workdir
+cd $workdir
+rm -r $compiledir
+mono $judge/bin/judge-csharp.exe testproject.dll
+
