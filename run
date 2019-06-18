@@ -17,7 +17,9 @@ cat "$(jshon -e 'source' -u < "$config")" > "solution.cs"
 # See if user code can be compiled
 compileresult="$(mktemp)"
 
-csc -target:library "solution.cs" > $compileresult
+echo "one"
+
+csc -target:library "solution.cs"
 if [ $? -ne 0 ]; then
     jshon -s "start-judgement"  -i "command" <<< "{}"
     message="<pre>$(cat $compileresult | tail -n +4)</pre>"
@@ -25,6 +27,8 @@ if [ $? -ne 0 ]; then
     jshon -s "close-judgement"  -i "command" -n {} -s "compilation error" -i "enum" -i "status" <<< "{}"
     exit 0
 fi
+
+echo "two"
 
 # Take default projectfile when there is none
 if [ $(find . -name testproject.csproj | wc -l ) -eq 0 ]; then
@@ -35,7 +39,11 @@ fi
 nuget restore -verbosity quiet testproject.csproj
 
 # Compile the code together with the tests
-msbuild /verbosity:quiet testproject.csproj > $compileresult
+msbuild /verbosity:quiet testproject.csproj
+
+echo "three"
+
+exit
 if [ $? -ne 0 ]; then
     jshon -s "start-judgement"  -i "command" <<< "{}"
     message="<pre>$(cat $compileresult | tail -n +4)</pre>"
