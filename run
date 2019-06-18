@@ -40,6 +40,8 @@ date
 # Add necesary libraries (mainly nunit)
 nuget restore -verbosity quiet testproject.csproj
 
+date
+
 # Compile the code together with the tests
 msbuild /verbosity:quiet testproject.csproj
 
