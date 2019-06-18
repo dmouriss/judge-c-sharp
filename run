@@ -43,7 +43,7 @@ nuget restore testproject.csproj
 date
 
 # Compile the code together with the tests
-msbuild testproject.csproj
+msbuild /verbosity:detailed testproject.csproj
 
 date
 
