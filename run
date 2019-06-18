@@ -38,7 +38,7 @@ fi
 date
 
 # Add necesary libraries (mainly nunit)
-nuget restore -verbosity quiet testproject.csproj
+nuget restore testproject.csproj
 
 date
 
