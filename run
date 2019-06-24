@@ -42,8 +42,10 @@ nuget restore testproject.csproj
 
 date
 
+ls -lhR /home/runner/.nuget/packages
+
 # Compile the code together with the tests
-msbuild /verbosity:detailed testproject.csproj
+msbuild /verbosity:quiet testproject.csproj
 
 date
 
