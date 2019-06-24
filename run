@@ -17,8 +17,6 @@ cat "$(jshon -e 'source' -u < "$config")" > "solution.cs"
 # See if user code can be compiled
 compileresult="$(mktemp)"
 
-date
-
 csc -target:library "solution.cs"
 if [ $? -ne 0 ]; then
     jshon -s "start-judgement"  -i "command" <<< "{}"
@@ -28,24 +26,18 @@ if [ $? -ne 0 ]; then
     exit 0
 fi
 
-date
-
 # Take default projectfile when there is none
 if [ $(find . -name testproject.csproj | wc -l ) -eq 0 ]; then
     cp $judge/defaults/testproject.csproj testproject.csproj
 fi
 
-date
-
 # Add necesary libraries (mainly nunit)
-nuget restore testproject.csproj
+nuget restore -verbosity quiet testproject.csproj
 
 date
-
-ls -lhR /home/runner/.nuget/packages
 
 # Compile the code together with the tests
-msbuild /verbosity:detailed testproject.csproj
+msbuild /verbosity:quiet testproject.csproj
 
 date
 
