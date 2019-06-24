@@ -37,7 +37,7 @@ ls -lhR /home/runner/.nuget
 nuget restore -verbosity quiet testproject.csproj
 
 # Compile the code together with the tests
-msbuild /verbosity:quiet testproject.csproj > $compileresult
+msbuild /verbosity:diag testproject.csproj
 
 if [ $? -ne 0 ]; then
     jshon -s "start-judgement"  -i "command" <<< "{}"
