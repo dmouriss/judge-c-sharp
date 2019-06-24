@@ -36,7 +36,7 @@ nuget restore -verbosity quiet testproject.csproj
 
 date
 # Compile the code together with the tests
-msbuild /verbosity:quiet testproject.csproj
+msbuild testproject.csproj
 date
 if [ $? -ne 0 ]; then
     jshon -s "start-judgement"  -i "command" <<< "{}"
