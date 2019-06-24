@@ -45,11 +45,10 @@ date
 ls -lhR /home/runner/.nuget/packages
 
 # Compile the code together with the tests
-msbuild /verbosity:quiet testproject.csproj
+msbuild /verbosity:detailed testproject.csproj
 
 date
 
-exit
 if [ $? -ne 0 ]; then
     jshon -s "start-judgement"  -i "command" <<< "{}"
     message="<pre>$(cat $compileresult | tail -n +4)</pre>"
