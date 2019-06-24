@@ -34,10 +34,9 @@ fi
 # Add necesary libraries (mainly nunit)
 nuget restore -verbosity quiet testproject.csproj
 
-date
 # Compile the code together with the tests
-msbuild testproject.csproj
-date
+msbuild /verbosity:detailed testproject.csproj
+
 if [ $? -ne 0 ]; then
     jshon -s "start-judgement"  -i "command" <<< "{}"
     message="<pre>$(cat $compileresult | tail -n +4)</pre>"
