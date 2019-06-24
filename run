@@ -31,13 +31,11 @@ if [ $(find . -name testproject.csproj | wc -l ) -eq 0 ]; then
     cp $judge/defaults/testproject.csproj testproject.csproj
 fi
 
-ls -lhR /home/runner/.nuget
-
 # Add necesary libraries (mainly nunit)
 nuget restore -verbosity quiet testproject.csproj
 
 # Compile the code together with the tests
-msbuild /verbosity:diag testproject.csproj
+msbuild /verbosity:quiet testproject.csproj > $compileresult
 
 if [ $? -ne 0 ]; then
     jshon -s "start-judgement"  -i "command" <<< "{}"
