@@ -26,16 +26,8 @@ if [ $? -ne 0 ]; then
     exit 0
 fi
 
-# Take default projectfile when there is none
-if [ $(find . -name testproject.csproj | wc -l ) -eq 0 ]; then
-    cp $judge/defaults/testproject.csproj testproject.csproj
-fi
-
-# Add necesary libraries (mainly nunit)
-nuget restore -verbosity quiet testproject.csproj
-
-# Compile the code together with the tests
-msbuild /verbosity:quiet testproject.csproj > $compileresult
+# Compiling solution with tests
+csc -reference:/home/runner/.nuget/packages/nunit/3.12.0/lib/net40/nunit.framework.dll -out:$workdir/testproject.dll -target:library solution.cs tests.cs > $compileresult
 
 if [ $? -ne 0 ]; then
     jshon -s "start-judgement"  -i "command" <<< "{}"
@@ -45,8 +37,10 @@ if [ $? -ne 0 ]; then
     exit 0
 fi
 
+# Copy testing framework
+cp /home/runner/.nuget/packages/nunit/3.12.0/lib/net40/nunit.framework.dll $workdir/nunit.framework.dll
+
 # Execute the tests
-mv net40/* $workdir
 cd $workdir
 rm -r $compiledir
 mono $judge/bin/judge-csharp.exe testproject.dll
