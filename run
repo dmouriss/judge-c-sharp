@@ -16,7 +16,7 @@ cat "$(jshon -e 'source' -u < "$config")" > "solution.cs"
 
 # Compiling solution with tests
 compileresult="$(mktemp)"
-csc -reference:/home/runner/.nuget/packages/nunit/3.12.0/lib/net40/nunit.framework.dll -out:$workdir/testproject.dll -target:library solution.cs tests.cs > $compileresult
+csc -reference:$judge/lib/nunit.framework.dll -out:$workdir/testproject.dll -target:library *.cs > $compileresult
 
 if [ $? -ne 0 ]; then
     jshon -s "start-judgement"  -i "command" <<< "{}"
@@ -27,7 +27,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Copy testing framework
-cp /home/runner/.nuget/packages/nunit/3.12.0/lib/net40/nunit.framework.dll $workdir/nunit.framework.dll
+cp $judge/lib/nunit.framework.dll $workdir/nunit.framework.dll
 
 # Execute the tests
 cd $workdir
