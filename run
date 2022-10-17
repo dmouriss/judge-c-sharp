@@ -22,7 +22,7 @@ if [ $? -ne 0 ]; then
     jshon -s "start-judgement"  -i "command" <<< "{}"
     message="<pre>$(cat $compileresult | tail -n +4)</pre>"
     jshon -s "append-message" -i "command" -n {} -s "html" -i "format" -s "$message" -i "description" -i "message"<<< "{}"
-    jshon -s "close-judgement"  -i "command" -n {} -s "compilation error" -i "enum" -i "status" <<< "{}"
+    jshon -s "close-judgement" -i "command" -n false -i "accepted" -n {} -s "compilation error" -i "enum" -i "status" <<< "{}"
     exit 0
 fi
 
@@ -33,3 +33,4 @@ cp $judge/lib/nunit.framework.dll $workdir/nunit.framework.dll
 cd $workdir
 rm -r $compiledir
 mono $judge/bin/judge-csharp.exe testproject.dll
+
