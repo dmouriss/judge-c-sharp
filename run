@@ -12,11 +12,13 @@ workdir="$(jshon -e 'workdir' -u < "$config")"
 compiledir=$(mktemp -d)
 cd $compiledir
 cp -r $resources/* .
+cp $judge/solution.csproj .
+cp -r $judge/lib .
 cat "$(jshon -e 'source' -u < "$config")" > "solution.cs"
 
 # Compiling solution with tests
 compileresult="$(mktemp)"
-csc -reference:$judge/lib/nunit.framework.dll -out:$workdir/testproject.dll -target:library *.cs > $compileresult
+dotnet build solution.csproj > $compileresult
 
 if [ $? -ne 0 ]; then
     jshon -s "start-judgement"  -i "command" <<< "{}"
@@ -26,11 +28,14 @@ if [ $? -ne 0 ]; then
     exit 0
 fi
 
+mv solution.dll $workdir
+
 # Copy testing framework
-cp $judge/lib/nunit.framework.dll $workdir/nunit.framework.dll
+cp -r $judge/lib/* $workdir
 
 # Execute the tests
 cd $workdir
 rm -r $compiledir
-mono $judge/bin/judge-csharp.exe testproject.dll
+
+$judge/bin/judge-csharp solution.dll
 
